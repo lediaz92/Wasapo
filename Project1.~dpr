@@ -1,0 +1,20 @@
+program Project1;
+
+uses
+  Forms,
+  Unit1 in 'Unit1.pas' {Form1},
+  UTipos in 'UTipos.pas',
+  LO_ArbolBinario in 'LO_ArbolBinario.pas',
+  LO_ListasDobles in 'LO_ListasDobles.pas',
+  LO_Pilas in 'LO_Pilas.pas',
+  LO_ArbolTrinario in 'LO_ArbolTrinario.pas',
+  LO_Hash in 'LO_Hash.pas',
+  LO_LDChatsCompartidos in 'LO_LDChatsCompartidos.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

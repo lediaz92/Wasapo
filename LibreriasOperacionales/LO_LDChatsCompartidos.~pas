@@ -1,0 +1,78 @@
+unit LO_LDChatsCompartidos;
+
+
+interface
+
+uses UTipos, LO_ArbolTrinario, SysUtils, Dialogs, ExtCtrls, StdCtrls;
+//Declaración de funciones y procedimientos************************************************************
+Procedure InsertarChat(Var Me:TipoMeChatsCompartido; RD:TRDChatsCompartido; IDUA:TEntero; IDUB:TEntero);
+Function CapturarRD(Var Me:TipoMeChatsCompartido; Pos:TPosicion):TRDChatsCompartido;
+//Implementación de funciones y procedimientos*********************************************************
+implementation
+//*****************************************************************************************************
+Procedure InsertarChat(Var Me:TipoMeChatsCompartido; RD:TRDChatsCompartido; IDUA:TEntero; IDUB:TEntero);
+Var
+ RC:TRCChatsCompartido;
+ RCLista, RegPadreRCLista:TRXChatsCompartido;
+ Pos, PosRCLista, PosUlt, PosReg:TPosicion;
+ RDAux:TRDChatsCompartido;
+Begin
+ LO_ArbolTrinario.AbrirMe(Me);
+ Seek(Me.C,_Cero);
+ Read(Me.C,RC);
+ PosReg:=RC.CantMensajesTotal+_Uno;
+ Pos:=_PosNula;
+ LO_ArbolTrinario.BuscarRX(Me,IDUA,IDUB,Pos);
+ If (Pos<>_PosNula) then
+  begin
+   Lo_ArbolTrinario.CapturarNodo(Me,Pos,RegPadreRCLista);
+   PosRCLista:= RegPadreRCLista.HijoMedio;
+   LO_ArbolTrinario.CapturarNodo(Me,PosRCLista,RCLista);
+   PosUlt:=RCLista.Ultimo;
+  end
+ else
+  PosUlt:=_PosNula;
+ Reset(Me.D);
+ If (PosUlt=_PosNula) then //Inserto el primer mensaje del chat.
+  begin
+   RD.Anterior:=_PosNula;
+   RD.Siguiente:=_PosNula;
+   RCLista.Primero:=PosReg;
+  end
+ else
+  begin
+   Seek(Me.D,PosUlt);
+   Read(Me.D,RDAux);
+   RDAux.Siguiente:=PosReg;
+   RD.Anterior:=PosUlt;
+   Seek(Me.D,PosUlt);
+   Write(Me.D,RDAux);
+  end;
+ RD.Numero_Mensaje:=RCLista.CantMensaje+_Uno;
+ RD.Id_UsuarioEmisor:=IDUA;
+ RD.Id_UsuarioReceptor:=IDUB;
+ RD.Fecha_Hora:=datetostr(Now)+' '+timetostr(Now);
+ RD.Mensaje_Enviado:=True;
+ RD.Mensaje_Recibido:=false;
+ RD.Mensaje_Leido:=false;
+ RCLista.CantMensaje:=RD.Numero_Mensaje;
+ RCLista.Ultimo:=PosReg;
+ RC.CantMensajesTotal:=PosReg;
+ LO_ArbolTrinario.ModificarRX(Me,PosRCLista,RCLista);
+ Seek(Me.D,PosReg);
+ Write(Me.D,RD);
+ Seek(Me.C,_Cero);
+ Write(Me.C,RC);
+end;
+//*****************************************************************************************************
+Function CapturarRD(Var Me:TipoMeChatsCompartido; Pos:TPosicion):TRDChatsCompartido;
+Var Reg:TRDChatsCompartido;
+Begin
+ Reset(Me.D);
+ Seek(Me.D,Pos);
+ Read(Me.D,Reg);
+ CapturarRD:=Reg;
+End;
+//*****************************************************************************************************
+End.
+
